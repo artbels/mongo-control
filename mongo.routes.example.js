@@ -2,6 +2,8 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var MH = require('../mongo.helpers');
 
+var databaseUri = 'mongodb://localhost:27017/coverage'; //don't forget to change when copy-paste
+
 var router = express.Router();
 
 router.use(bodyParser.urlencoded({extended: false}));
@@ -18,7 +20,10 @@ var l = helperNames.length;
 
   router.post(route, function(req, res) {
 
-    func(req.body).then(function(r) {
+    var params = req.body || {};
+    params.db = databaseUri;
+
+    func(params).then(function(r) {
       res.json(r);
     }).catch(function(e) {
       res.json(e);
