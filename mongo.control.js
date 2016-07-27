@@ -222,16 +222,6 @@ MC.removeById = function(params) {
       }
     }
 
-    try {
-      params.update = JSON.parse(params.update);
-      for (var key in params.update) {
-        var item = params.update[key];
-        if (reJsStrData.test(item)) params.update[key] = new Date(item);
-      }
-    } catch (e) {
-      return err(e);
-    }
-
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
 
