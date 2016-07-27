@@ -10,14 +10,16 @@ MC.count = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection) return err("!params.db || !params.collection");
 
-    if (params.query && (typeof params.query == "string")) {
-      try {
-        params.query = JSON.parse(params.query);
-      } catch (e) {
-        params.query = {};
-        err(e);
+    if (params.query) {
+      if (typeof params.query == "string") {
+        try {
+          params.query = JSON.parse(params.query);
+        } catch (e) {
+          params.query = {};
+          err(e);
+        }
       }
-    }
+    } else params.query = {};
 
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
@@ -37,16 +39,18 @@ MC.find = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection) return err("!params.db || !params.collection");
 
-    if (params.query && (typeof params.query == "string")) {
-      try {
-        params.query = JSON.parse(params.query);
-      } catch (e) {
-        params.query = {};
-        err(e);
+    if (params.query) {
+      if (typeof params.query == "string") {
+        try {
+          params.query = JSON.parse(params.query);
+        } catch (e) {
+          params.query = {};
+          err(e);
+        }
       }
-    }
+    } else params.query = {};
 
-    if(params.limit) params.limit = parseInt(params.limit, 10);
+    if (params.limit) params.limit = parseInt(params.limit, 10);
     else params.limit = 0;
 
     MongoClient.connect(params.db, function(e, db) {
@@ -97,6 +101,54 @@ MC.insert = function(params) {
     });
   });
 };
+
+
+MC.update = function(params) {
+
+  return new Promise(function(res, err) {
+    if (!params.db || !params.collection || !params.query || !params.update) return err("!params.db || !params.collection || !params.id || !params.update");
+
+    if (params.query) {
+      if (typeof params.query == "string") {
+        try {
+          params.query = JSON.parse(params.query);
+        } catch (e) {
+          params.query = {};
+          err(e);
+        }
+      }
+    } else params.query = {};
+
+
+    if (typeof params.update == "string") {
+      try {
+        params.update = JSON.parse(params.update);
+        for (var key in params.update) {
+          var item = params.update[key];
+          if (reJsStrData.test(item)) params.update[key] = new Date(item);
+        }
+      } catch (e) {
+        return err(e);
+      }
+    }
+
+    var updObj = {
+      "$set": params.update
+    };
+
+    MongoClient.connect(params.db, function(e, db) {
+      if (e) return err(e);
+
+      db.collection(params.collection).updateMany(params.query, updObj, function(e, r) {
+        if (e) return err(e);
+
+        res(r);
+        db.close();
+      });
+    });
+  });
+};
+
 
 
 MC.updateById = function(params) {
@@ -248,14 +300,16 @@ MC.remove = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection) return err("!params.db || !params.collection");
 
-    if (params.query && (typeof params.query == "string")) {
-      try {
-        params.query = JSON.parse(params.query);
-      } catch (e) {
-        params.query = {};
-        err(e);
+    if (params.query) {
+      if (typeof params.query == "string") {
+        try {
+          params.query = JSON.parse(params.query);
+        } catch (e) {
+          params.query = {};
+          err(e);
+        }
       }
-    }
+    } else params.query = {};
 
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
@@ -310,7 +364,7 @@ MC.unsetField = function(params) {
     if (!params.db || !params.collection || !params.field) return err("!params.db || !params.collection || !params.field");
 
     if (params.query) {
-      if(typeof params.query == "string") {
+      if (typeof params.query == "string") {
         try {
           params.query = JSON.parse(params.query);
         } catch (e) {

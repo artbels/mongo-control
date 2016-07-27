@@ -1,6 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var MH = require('../mongo.helpers');
+var MC = require('../mongo.helpers');
 
 var databaseUri = 'mongodb://localhost:27017/coverage'; //don't forget to change when copy-paste
 
@@ -10,12 +10,12 @@ router.use(bodyParser.urlencoded({extended: false}));
 router.use(bodyParser.json());
 
 var i = 0;
-var helperNames = Object.keys(MH);
+var helperNames = Object.keys(MC);
 var l = helperNames.length;
 
 (function iter() {
   var funcName = helperNames[i];
-  var func = MH[funcName];
+  var func = MC[funcName];
   var route = "/" + funcName.toLowerCase();
 
   router.post(route, function(req, res) {
