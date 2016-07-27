@@ -3,9 +3,10 @@ var ObjectID = require('mongodb').ObjectID;
 var reJsStrData = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z/i;
 var reMongoId = /^[0-9a-f]{24}$/;
 
-var MH = module.exports = {};
+var MC = module.exports = {};
 
-MH.count = function(params) {
+
+MC.count = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection) return err("!params.db || !params.collection");
 
@@ -32,7 +33,7 @@ MH.count = function(params) {
 };
 
 
-MH.find = function(params) {
+MC.find = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection) return err("!params.db || !params.collection");
 
@@ -62,7 +63,7 @@ MH.find = function(params) {
 };
 
 
-MH.insert = function(params) {
+MC.insert = function(params) {
   return new Promise(function(res, err) {
 
     if (!params.db || !params.collection || !params.data || !params.data.length) return err("!params.db || !params.collection || !params.data");
@@ -98,7 +99,7 @@ MH.insert = function(params) {
 };
 
 
-MH.updateById = function(params) {
+MC.updateById = function(params) {
 
   return new Promise(function(res, err) {
     if (!params.db || !params.collection || !params.id || !params.update) return err("!params.db || !params.collection || !params.id || !params.update");
@@ -155,7 +156,7 @@ MH.updateById = function(params) {
 };
 
 
-MH.removeById = function(params) {
+MC.removeById = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection || !params.id) return err("!params.db || !params.collection || !params.id");
 
@@ -207,7 +208,7 @@ MH.removeById = function(params) {
 };
 
 
-MH.dropCollection = function(params) {
+MC.dropCollection = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection) return err("!params.db || !params.collection");
 
@@ -225,7 +226,7 @@ MH.dropCollection = function(params) {
 };
 
 
-MH.distinct = function(params) {
+MC.distinct = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection || !params.field) return err("!params.db || !params.collection || !params.field");
 
@@ -243,7 +244,7 @@ MH.distinct = function(params) {
 };
 
 
-MH.remove = function(params) {
+MC.remove = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection) return err("!params.db || !params.collection");
 
@@ -270,7 +271,7 @@ MH.remove = function(params) {
 };
 
 
-MH.rename = function(params) {
+MC.rename = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection || !params.old || !params.new) return err("!params.db || !params.collection || !params.old || !params.new");
 
@@ -304,7 +305,7 @@ MH.rename = function(params) {
 };
 
 
-MH.unsetField = function(params) {
+MC.unsetField = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection || !params.field) return err("!params.db || !params.collection || !params.field");
 
@@ -338,7 +339,7 @@ MH.unsetField = function(params) {
 };
 
 
-MH.listCollections = function(params) {
+MC.listCollections = function(params) {
   return new Promise(function(res, err) {
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
@@ -354,7 +355,7 @@ MH.listCollections = function(params) {
 };
 
 
-MH.dbStats = function(params) {
+MC.dbStats = function(params) {
   return new Promise(function(res, err) {
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
@@ -370,7 +371,7 @@ MH.dbStats = function(params) {
 };
 
 
-MH.collectionStats = function(params) {
+MC.collectionStats = function(params) {
   return new Promise(function(res, err) {
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
@@ -386,7 +387,7 @@ MH.collectionStats = function(params) {
 };
 
 
-MH.listDatabases = function(params) {
+MC.listDatabases = function(params) {
   return new Promise(function(res, err) {
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
