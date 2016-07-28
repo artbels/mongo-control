@@ -117,7 +117,7 @@ MC.insert = function(params) {
 MC.update = function(params) {
 
   return new Promise(function(res, err) {
-    if (!params.db || !params.collection || !params.query || !params.update) return err("!params.db || !params.collection || !params.id || !params.update");
+    if (!params.db || !params.collection || !params.query || !params.update) return err("!params.db || !params.collection || !params.query || !params.update");
 
     if (params.query) {
       if (typeof params.query == "string") {
