@@ -303,18 +303,16 @@ MC.distinct = function(params) {
 
 MC.remove = function(params) {
   return new Promise(function(res, err) {
-    if (!params.db || !params.collection) return err("!params.db || !params.collection");
+    if (!params.db || !params.collection || !params.query) return err("!params.db || !params.collection || !params.query");
 
-    if (params.query) {
-      if (typeof params.query == "string") {
-        try {
-          params.query = JSON.parse(params.query);
-        } catch (e) {
-          params.query = {};
-          err(e);
-        }
+    if (typeof params.query == "string") {
+      try {
+        params.query = JSON.parse(params.query);
+      } catch (e) {
+        params.query = {};
+        err(e);
       }
-    } else params.query = {};
+    }
 
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
