@@ -134,13 +134,14 @@ MC.update = function(params) {
     if (typeof params.update == "string") {
       try {
         params.update = JSON.parse(params.update);
-        for (var key in params.update) {
-          var item = params.update[key];
-          if (reJsStrData.test(item)) params.update[key] = new Date(item);
-        }
       } catch (e) {
         return err(e);
       }
+    }
+
+    for (var key in params.update) {
+      var item = params.update[key];
+      if (reJsStrData.test(item)) params.update[key] = new Date(item);
     }
 
     var updObj = {
@@ -177,14 +178,17 @@ MC.updateById = function(params) {
       }
     }
 
-    try {
-      params.update = JSON.parse(params.update);
-      for (var key in params.update) {
-        var item = params.update[key];
-        if (reJsStrData.test(item)) params.update[key] = new Date(item);
+    if (typeof params.update == "string") {
+      try {
+        params.update = JSON.parse(params.update);
+      } catch (e) {
+        return err(e);
       }
-    } catch (e) {
-      return err(e);
+    }
+
+    for (var key in params.update) {
+      var item = params.update[key];
+      if (reJsStrData.test(item)) params.update[key] = new Date(item);
     }
 
     var updObj = {
