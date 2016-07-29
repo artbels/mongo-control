@@ -100,10 +100,12 @@ MC.insert = function(params) {
       }
     }
 
+    params.ordered = params.ordered || true;
+
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
 
-      db.collection(params.collection).insert(params.data, function(e, r) {
+      db.collection(params.collection).insert(params.data, params.ordered, function(e, r) {
         if (e) return err(e);
 
         res(r);
