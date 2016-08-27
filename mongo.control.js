@@ -396,6 +396,9 @@ MC.unsetField = function(params) {
       var unsetObj = {};
 
       if(params.fields) {
+        if(typeof params.fields == "string")
+          params.fields = JSON.parse(params.fields);
+
         params.fields.forEach(function (a) {
           unsetObj[a] = "";
         });
