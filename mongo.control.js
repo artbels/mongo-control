@@ -377,7 +377,7 @@ MC.rename = function(params) {
 
 MC.unsetField = function(params) {
   return new Promise(function(res, err) {
-    if (!params.db || !params.collection || !params.field) return err("!params.db || !params.collection || !params.field");
+    if (!params.db || !params.collection || (!params.field && !params.fields)) return err("!params.db || !params.collection || !params.field(s)");
 
     if (params.query) {
       if (typeof params.query == "string") {
@@ -394,7 +394,12 @@ MC.unsetField = function(params) {
       if (e) return err(e);
 
       var unsetObj = {};
-      unsetObj[params.field] = "";
+
+      if(params.fields) {
+        params.fields.forEach(function (a) {
+          unsetObj[a] = "";
+        });
+      } else unsetObj[params.field] = "";
 
       db.collection(params.collection).updateMany(params.query, {
         "$unset": unsetObj
