@@ -105,7 +105,9 @@ MC.insert = function(params) {
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
 
-      db.collection(params.collection).insert(params.data, {keepGoing: params.keepGoing}, function(e, r) {
+      db.collection(params.collection).insert(params.data, {
+        keepGoing: params.keepGoing
+      }, function(e, r) {
         if (e) return err(e);
 
         res(r);
@@ -390,16 +392,26 @@ MC.unsetField = function(params) {
       }
     } else params.query = {};
 
+    if (params.id) {
+      if (reMongoId.test(params.id)) {
+        try {
+          params.query._id = new ObjectID(params.id);
+        } catch (idErr) {
+          console.warn(idErr);
+        }
+      } else params.query._id = params.id;
+    }
+
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
 
       var unsetObj = {};
 
-      if(params.fields) {
-        if(typeof params.fields == "string")
+      if (params.fields) {
+        if (typeof params.fields == "string")
           params.fields = JSON.parse(params.fields);
 
-        params.fields.forEach(function (a) {
+        params.fields.forEach(function(a) {
           unsetObj[a] = "";
         });
       } else unsetObj[params.field] = "";
