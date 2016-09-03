@@ -6,6 +6,43 @@ var reMongoId = /^[0-9a-f]{24}$/;
 var MC = module.exports = {};
 
 
+MC.keys = function(params) {
+  return new Promise(function(res, err) {
+    if (!params.db || !params.collection) return err("!params.db || !params.collection");
+
+    if (params.query) {
+      if (typeof params.query == "string") {
+        try {
+          params.query = JSON.parse(params.query);
+        } catch (e) {
+          params.query = {};
+          err(e);
+        }
+      }
+    } else params.query = {};
+
+    MongoClient.connect(params.db, function(e, db) {
+      if (e) return err(e);
+
+      var uniqKeys = {};
+
+      db.collection(params.collection).find(params.query).each(function(e, doc) {
+        if (e) return err(e);
+
+        if (doc) {
+          for (var key in doc) {
+            uniqKeys[key] = true;
+          }
+        } else {
+          res(Object.keys(uniqKeys));
+          db.close();
+        }
+      });
+    });
+  });
+};
+
+
 MC.count = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection) return err("!params.db || !params.collection");
