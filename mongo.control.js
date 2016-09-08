@@ -78,7 +78,10 @@ MC.each = function(params) {
       cursor.each(function(e, doc) {
         if (e) return err(e);
 
-        if (!doc) return db.close();
+        if (!doc) {
+          res('completed');
+          return db.close();
+        }
 
         doc = workLine(doc);
 
