@@ -47,7 +47,7 @@ MC.eachCb = function(params) {
       }, function(e) {
         if (e) return err(e);
         res('completed');
-      }););
+      });
     });
   });
 };
