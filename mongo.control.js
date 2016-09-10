@@ -29,24 +29,25 @@ MC.each = function(params) {
 
       var workLine = new Function("doc", params.func);
 
+      var result = 'completed';
+
       cursor.each(function(e, doc) {
         if (e) return err(e);
 
         if (!doc) {
-          res('completed');
+          res(result);
           return db.close();
         }
 
         try {
           doc = workLine(doc);
-        } catch (error) {
-          db.close();
-          return err(error);
-        }
+          db.collection(params.collection).save(doc, function(e) {
+            err(e);
+          });
 
-        db.collection(params.collection).save(doc, function(e) {
-          err(e);
-        });
+        } catch (error) {
+          result = error.toString();
+        }        
       });
     });
   });
