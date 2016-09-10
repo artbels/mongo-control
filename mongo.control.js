@@ -40,7 +40,7 @@ MC.each = function(params) {
         try {
           doc = workLine(doc);
         } catch (error) {
-          console.log(e);
+          db.close();
           return err(error);
         }
 
