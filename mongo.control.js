@@ -39,8 +39,8 @@ MC.each = function(params) {
 
         try {
           doc = workLine(doc);
-        } catch (err) {
-          err(err);
+        } catch (error) {
+          err(error);
         }
 
         db.collection(params.collection).save(doc, function(e) {
