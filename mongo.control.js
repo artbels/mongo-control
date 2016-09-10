@@ -39,7 +39,9 @@ MC.each = function(params) {
 
         doc = workLine(doc);
 
-        db.collection(params.collection).save(doc);
+        db.collection(params.collection).save(doc, function(e) {
+          err(e);
+        });
       });
     });
   });
@@ -177,7 +179,7 @@ MC.insert = function(params) {
       }
     }
 
-    if(!params.data.length) return err("nothing to save, empty array");
+    if (!params.data.length) return err("nothing to save, empty array");
 
     params.keepGoing = params.keepGoing || false;
 
