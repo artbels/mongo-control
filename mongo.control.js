@@ -331,17 +331,17 @@ MC.getById = function(params) {
     MongoClient.connect(params.db, function(e, db) {
       if (e) return err(e);
 
-      db.collection(params.collection).find({
+      db.collection(params.collection).findOne({
         _id: objId || params.id
       }, function(e, r) {
         if (e) return err(e);
 
-        if (r.length || !objId) {
+        if (r || !objId) {
           res(r);
           db.close();
 
         } else {
-          db.collection(params.collection).find({
+          db.collection(params.collection).findOne({
             _id: params.id
           }, function(e, r) {
             if (e) return err(e);
