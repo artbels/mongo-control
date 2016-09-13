@@ -314,6 +314,48 @@ MC.updateById = function(params) {
 };
 
 
+MC.getById = function(params) {
+  return new Promise(function(res, err) {
+    if (!params.db || !params.collection || !params.id) return err("!params.db || !params.collection || !params.id");
+
+    var objId;
+
+    if (reMongoId.test(params.id)) {
+      try {
+        objId = new ObjectID(params.id);
+      } catch (idErr) {
+        console.warn(idErr);
+      }
+    }
+
+    MongoClient.connect(params.db, function(e, db) {
+      if (e) return err(e);
+
+      db.collection(params.collection).find({
+        _id: objId || params.id
+      }, function(e, r) {
+        if (e) return err(e);
+
+        if (r.length || !objId) {
+          res(r);
+          db.close();
+
+        } else {
+          db.collection(params.collection).find({
+            _id: params.id
+          }, function(e, r) {
+            if (e) return err(e);
+
+            res(r);
+            db.close();
+          });
+        }
+      });
+    });
+  });
+};
+
+
 MC.removeById = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection || !params.id) return err("!params.db || !params.collection || !params.id");
