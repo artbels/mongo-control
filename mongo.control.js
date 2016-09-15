@@ -48,7 +48,7 @@ MC.group = function(params) {
         if (e) return err(e);
 
         docs = docs.map(function (a) {
-          return a.id;
+          return a._id;
         });
 
         res(docs);
