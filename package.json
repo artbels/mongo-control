@@ -1,6 +1,6 @@
 {
   "name": "mongo-control",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "Simple functions to control mongo",
   "main": "mongo.control.js",
   "scripts": {
