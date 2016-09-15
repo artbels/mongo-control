@@ -7,6 +7,54 @@ var reMongoId = /^[0-9a-f]{24}$/;
 var MC = module.exports = {};
 
 
+MC.group = function(params) {
+  return new Promise(function(res, err) {
+    if (!params.db || !params.collection || !params.fields) return err("!params.db || !params.collection || !params.func");
+
+    var agrQuery = [];
+
+    if (params.query) {
+      if (typeof params.query == "string") {
+        try {
+          params.query = JSON.parse(params.query);
+        } catch (e) {
+          err(e);
+        }
+      }
+      agrQuery.push({
+        $match: params.query
+      });
+    }
+
+    if (typeof params.fields == "string")
+      params.fields = JSON.parse(params.fields);
+
+    var groupObj = {
+      $group: {
+        _id: {}
+      }
+    };
+
+    params.fields.forEach(function(a) {
+      groupObj.$group._id[a] = "$" + a;
+    });
+
+    agrQuery.push(groupObj);
+
+    MongoClient.connect(params.db, function(e, db) {
+      if (e) return err(e);
+
+      db.collection(params.collection).aggregate(agrQuery, function(e, docs) {
+        if (e) return err(e);
+
+        res(docs);
+        db.close();
+      });
+    });
+  });
+};
+
+
 MC.each = function(params) {
   return new Promise(function(res, err) {
     if (!params.db || !params.collection || !params.func) return err("!params.db || !params.collection || !params.func");
@@ -47,7 +95,7 @@ MC.each = function(params) {
 
         } catch (error) {
           result = error.toString();
-        }        
+        }
       });
     });
   });
