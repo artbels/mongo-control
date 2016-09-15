@@ -47,6 +47,10 @@ MC.group = function(params) {
       db.collection(params.collection).aggregate(agrQuery, function(e, docs) {
         if (e) return err(e);
 
+        docs.map(function (a) {
+          return a.id;
+        });
+
         res(docs);
         db.close();
       });
