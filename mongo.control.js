@@ -81,13 +81,16 @@ MC.each = function(params) {
 
       var workLine = new Function("doc", params.func);
 
-      var result = 'completed';
+      var errors = {};
 
       cursor.each(function(e, doc) {
-        if (e) return err(e);
+
+        if (e) {
+          return err(e);
+        }
 
         if (!doc) {
-          res(result);
+          res(errors);
           return db.close();
         }
 
@@ -98,8 +101,11 @@ MC.each = function(params) {
           });
 
         } catch (error) {
-          result = error.toString();
-        }
+          if(error) {
+            if(errors[error.toString()]) errors[error.toString()]++;
+            else errors[error.toString()] = 1;
+          }
+        }        
       });
     });
   });
