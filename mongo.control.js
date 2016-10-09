@@ -227,7 +227,7 @@ MC.schema = function (params) {
           for (var key in doc) {
             var type = typeof doc[key]
             if(type === 'object') {
-              var objConstr = doc[key].constructor.toString().split(' ')[1].slice(0,-2)
+              var objConstr = doc[key].constructor.toString().split(' ')[1].slice(0,-2).toLowerCase()
               uniqKeys[key] = objConstr
             } else uniqKeys[key] = typeof doc[key]
           }
