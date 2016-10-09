@@ -232,7 +232,7 @@ MC.schema = function (params) {
                   .constructor
                   .toString()
                   .split(' ')[1]
-                  .slice(0,-2)
+                  .split('(')[0]
                   .toLowerCase()
                 uniqKeys[key] = objConstr
               }
