@@ -200,6 +200,46 @@ MC.keys = function (params) {
   })
 }
 
+MC.schema = function (params) {
+  return new Promise(function (res, err) {
+    if (!params.db || !params.collection) return err('!params.db || !params.collection')
+
+    if (params.query) {
+      if (typeof params.query == 'string') {
+        try {
+          params.query = JSON.parse(params.query)
+        } catch (e) {
+          params.query = {}
+          err(e)
+        }
+      }
+    } else params.query = {}
+
+    MongoClient.connect(params.db, function (e, db) {
+      if (e) return err(e)
+
+      var uniqKeys = {}
+
+      db.collection(params.collection).find(params.query).each(function (e, doc) {
+        if (e) return err(e)
+
+        if (doc) {
+          for (var key in doc) {
+            var type = typeof doc[key]
+            if(type === 'object') {
+              var objConstr = doc[key].constructor.toString().split(' ')[1].slice(0,-2)
+              uniqKeys[key] = objConstr
+            } else uniqKeys[key] = typeof doc[key]
+          }
+        } else {
+          res(uniqKeys)
+          db.close()
+        }
+      })
+    })
+  })
+}
+
 MC.count = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection) return err('!params.db || !params.collection')
