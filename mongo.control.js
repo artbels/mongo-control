@@ -48,6 +48,23 @@ MC.dropIndexes = function (params) {
   })
 }
 
+MC.dropIndex = function (params) {
+  return new Promise(function (res, err) {
+    if (!params.db || !params.collection || !params.index) return err('!params.db || !params.collection  || !params.index')
+
+    MongoClient.connect(params.db, function (e, db) {
+      if (e) return err(e)
+
+      db.collection(params.collection).dropIndex(params.index, function (e, r) {
+        if (e) return err(e)
+
+        res(r)
+        db.close()
+      })
+    })
+  })
+}
+
 MC.indexInfo = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection) return err('!params.db || !params.collection')
