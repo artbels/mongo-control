@@ -170,9 +170,9 @@ MC.dupes = function (params) {
           return db.close()
         }
 
-        if(doc.field) {
-          if(uniq[doc.field]) nonUniq[doc.field] = true
-          else uniq[doc.field] = true
+        if(params.field) {
+          if(uniq[doc[params.field]]) nonUniq[doc[params.field]] = true
+          else uniq[doc[params.field]] = true
         }
       })
     })
@@ -215,15 +215,16 @@ MC.groupCount = function (params) {
           return db.close()
         }
 
-        if(doc.field === undefined) doc.field = 'undefined'
-        if(doc.field === null) doc.field = 'null'
+        if(doc[params.field] === undefined) doc[params.field] = 'undefined'
+        if(doc[params.field] === null) doc[params.field] = 'null'
 
-        if(uniq[doc.field]) uniq[doc.field]++
-        else uniq[doc.field] = 1
+        if(uniq[doc[params.field]]) uniq[doc[params.field]]++
+        else uniq[doc[params.field]] = 1
       })
     })
   })
 }
+
 
 MC.each = function (params) {
   return new Promise(function (res, err) {
