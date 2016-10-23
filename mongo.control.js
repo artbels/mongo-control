@@ -133,6 +133,98 @@ MC.group = function (params) {
   })
 }
 
+MC.dupes = function (params) {
+  return new Promise(function (res, err) {
+    if (!params.db || !params.collection || !params.field) return err('!params.db || !params.collection || !params.field')
+
+    if (params.query) {
+      if (typeof params.query == 'string') {
+        try {
+          params.query = JSON.parse(params.query)
+        } catch (e) {
+          params.query = {}
+          err(e)
+        }
+      }
+    } else params.query = {}
+
+    MongoClient.connect(params.db, function (e, db) {
+      if (e) return err(e)
+
+      var projection = {
+        _id: 0
+      }
+
+      projection[params.field] = 1
+
+      var cursor = db.collection(params.collection).find(params.query, projection)
+
+      var uniq = {}
+      var nonUniq = {}
+
+      cursor.each(function (e, doc) {
+        if (e) return err(e)
+
+        if(!doc.field) return
+
+        if(uniq[doc.field]) nonUniq[doc.field] = true
+        else uniq[doc.field] = true
+
+        if (!doc) {
+          res(Object.keys(nonUniq))
+          return db.close()
+        }
+      })
+    })
+  })
+}
+
+MC.groupCount = function (params) {
+  return new Promise(function (res, err) {
+    if (!params.db || !params.collection || !params.field) return err('!params.db || !params.collection || !params.field')
+
+    if (params.query) {
+      if (typeof params.query == 'string') {
+        try {
+          params.query = JSON.parse(params.query)
+        } catch (e) {
+          params.query = {}
+          err(e)
+        }
+      }
+    } else params.query = {}
+
+    MongoClient.connect(params.db, function (e, db) {
+      if (e) return err(e)
+
+      var projection = {
+        _id: 0
+      }
+
+      projection[params.field] = 1
+
+      var cursor = db.collection(params.collection).find(params.query, projection)
+
+      var uniq = {}
+
+      cursor.each(function (e, doc) {
+        if (e) return err(e)
+
+        if(doc.field === undefined) doc.field = 'undefined'
+        if(doc.field === null) doc.field = 'null'
+
+        if(uniq[doc.field]) uniq[doc.field]++
+        else uniq[doc.field] = 1
+
+        if (!doc) {
+          res(uniq)
+          return db.close()
+        }
+      })
+    })
+  })
+}
+
 MC.each = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection || !params.func) return err('!params.db || !params.collection || !params.func')
