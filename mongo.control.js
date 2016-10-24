@@ -6,6 +6,39 @@ var reMongoId = /^[0-9a-f]{24}$/
 
 var MC = module.exports = {}
 
+MC.createIndex = function (params) {
+  return new Promise(function (res, err) {
+    if (!params.db || !params.collection || !params.index) return err('!params.db || !params.collection || !params.index')
+
+    if (typeof params.index === 'string') {
+      try {
+        params.index = JSON.parse(params.index)
+      } catch (e) {
+        err(e)
+      }
+    }
+
+    if (typeof params.options === 'string') {
+      try {
+        params.options = JSON.parse(params.options)
+      } catch (e) {
+        err(e)
+      }
+    }
+
+    MongoClient.connect(params.db, function (e, db) {
+      if (e) return err(e)
+
+      db.collection(params.collection).createIndex (params.index, params.options, function (e, r) {
+        if (e) return err(e)
+
+        res(r)
+        db.close()
+      })
+    })
+  })
+}
+
 MC.ensureIndex = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection || !params.index) return err('!params.db || !params.collection || !params.index')
