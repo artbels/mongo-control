@@ -368,18 +368,7 @@ MC.schema = function (params) {
 
         if (doc) {
           for (var key in doc) {
-            var type = typeof doc[key]
-            if(type === 'object') {
-              if(doc[key] !== null) {
-                var objConstr = doc[key]
-                  .constructor
-                  .toString()
-                  .split(' ')[1]
-                  .split('(')[0]
-                  .toLowerCase()
-                uniqKeys[key] = objConstr
-              } else uniqKeys[key] = "null"
-            } else uniqKeys[key] = typeof doc[key]
+            uniqKeys[key] = getType(doc[key])
           }
         } else {
           res(uniqKeys)
@@ -388,6 +377,21 @@ MC.schema = function (params) {
       })
     })
   })
+
+  function getType(val) {
+    var type = typeof val
+    if(type === 'object') {
+      if(val !== null) {
+        var objConstr = val
+          .constructor
+          .toString()
+          .split(' ')[1]
+          .split('(')[0]
+          .toLowerCase()
+        return objConstr
+      } else return = "null"
+    } else return typeof doc[key]
+  }
 }
 
 MC.count = function (params) {
