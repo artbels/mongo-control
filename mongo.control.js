@@ -390,7 +390,7 @@ MC.schema = function (params) {
           .toLowerCase()
         return objConstr
       } else return "null"
-    } else return typeof doc[key]
+    } else return typeof val
   }
 }
 
