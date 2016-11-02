@@ -389,7 +389,7 @@ MC.schema = function (params) {
           .split('(')[0]
           .toLowerCase()
         return objConstr
-      } else return = "null"
+      } else return "null"
     } else return typeof doc[key]
   }
 }
