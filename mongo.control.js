@@ -29,7 +29,7 @@ MC.createIndex = function (params) {
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
 
-      db.collection(params.collection).createIndex (params.index, params.options, function (e, r) {
+      db.collection(params.collection).createIndex(params.index, params.options, function (e, r) {
         if (e) return err(e)
 
         res(r)
@@ -203,8 +203,8 @@ MC.dupes = function (params) {
           return db.close()
         }
 
-        if(params.field) {
-          if(uniq[doc[params.field]]) nonUniq[doc[params.field]] = true
+        if (params.field) {
+          if (uniq[doc[params.field]]) nonUniq[doc[params.field]] = true
           else uniq[doc[params.field]] = true
         }
       })
@@ -248,16 +248,15 @@ MC.groupCount = function (params) {
           return db.close()
         }
 
-        if(doc[params.field] === undefined) doc[params.field] = 'undefined'
-        if(doc[params.field] === null) doc[params.field] = 'null'
+        if (doc[params.field] === undefined) doc[params.field] = 'undefined'
+        if (doc[params.field] === null) doc[params.field] = 'null'
 
-        if(uniq[doc[params.field]]) uniq[doc[params.field]]++
+        if (uniq[doc[params.field]]) uniq[doc[params.field]]++
         else uniq[doc[params.field]] = 1
       })
     })
   })
 }
-
 
 MC.each = function (params) {
   return new Promise(function (res, err) {
@@ -378,10 +377,10 @@ MC.schema = function (params) {
     })
   })
 
-  function getType(val) {
+  function getType (val) {
     var type = typeof val
-    if(type === 'object') {
-      if(val !== null) {
+    if (type === 'object') {
+      if (val !== null) {
         var objConstr = val
           .constructor
           .toString()
@@ -389,7 +388,7 @@ MC.schema = function (params) {
           .split('(')[0]
           .toLowerCase()
         return objConstr
-      } else return "null"
+      } else return 'null'
     } else return typeof val
   }
 }
