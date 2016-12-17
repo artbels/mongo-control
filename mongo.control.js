@@ -832,8 +832,21 @@ MC.unsetField = function (params) {
       }, function (e, r) {
         if (e) return err(e)
 
-        res(r)
-        db.close()
+        if (r.result.nModified || !objId) {
+          res(r)
+          db.close()
+        } else {
+          db.collection(params.collection).updateMany({
+            _id: params.id
+          }, {
+            '$unset': unsetObj
+          }, function (e, r) {
+            if (e) return err(e)
+
+            res(r)
+            db.close()
+          })
+        }
       })
     })
   })
