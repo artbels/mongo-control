@@ -580,10 +580,8 @@ MC.updateById = function (params) {
       }
     }
 
-    var updObj = {
-      '$set': params.update
-    }
-
+    var updObj = {}
+    if (Object.keys(params.update).length) updObj.$set = params.update
     if (Object.keys(unset).length) updObj.$unset = unset
 
     MongoClient.connect(params.db, function (e, db) {
