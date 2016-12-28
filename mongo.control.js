@@ -43,7 +43,7 @@ MC.ensureIndex = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection || !params.index) return err('!params.db || !params.collection || !params.index')
 
-    if (typeof params.index == 'string') {
+    if (typeof params.index === 'string') {
       try {
         params.index = JSON.parse(params.index)
       } catch (e) {
@@ -122,7 +122,7 @@ MC.group = function (params) {
     var agrQuery = []
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -134,8 +134,9 @@ MC.group = function (params) {
       })
     }
 
-    if (typeof params.fields == 'string')
+    if (typeof params.fields === 'string') {
       params.fields = JSON.parse(params.fields)
+    }
 
     var groupObj = {
       $group: {
@@ -171,7 +172,7 @@ MC.dupes = function (params) {
     if (!params.db || !params.collection || !params.field) return err('!params.db || !params.collection || !params.field')
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -217,7 +218,7 @@ MC.groupCount = function (params) {
     if (!params.db || !params.collection || !params.field) return err('!params.db || !params.collection || !params.field')
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -263,7 +264,7 @@ MC.each = function (params) {
     if (!params.db || !params.collection || !params.func) return err('!params.db || !params.collection || !params.func')
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -311,7 +312,7 @@ MC.keys = function (params) {
     if (!params.db || !params.collection) return err('!params.db || !params.collection')
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -347,7 +348,7 @@ MC.schema = function (params) {
     if (!params.db || !params.collection) return err('!params.db || !params.collection')
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -398,7 +399,7 @@ MC.count = function (params) {
     if (!params.db || !params.collection) return err('!params.db || !params.collection')
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -426,7 +427,7 @@ MC.find = function (params) {
     if (!params.db || !params.collection) return err('!params.db || !params.collection')
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -437,7 +438,7 @@ MC.find = function (params) {
     } else params.query = {}
 
     if (params.projection) {
-      if (typeof params.projection == 'string') {
+      if (typeof params.projection === 'string') {
         try {
           params.projection = JSON.parse(params.projection)
         } catch (e) {
@@ -467,7 +468,7 @@ MC.insert = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection || !params.data) return err('!params.db || !params.collection || !params.data')
 
-    if (typeof params.data == 'string') {
+    if (typeof params.data === 'string') {
       try {
         params.data = JSON.parse(params.data)
 
@@ -507,7 +508,7 @@ MC.update = function (params) {
     if (!params.db || !params.collection || !params.query || !params.update) return err('!params.db || !params.collection || !params.query || !params.update')
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -517,7 +518,7 @@ MC.update = function (params) {
       }
     } else params.query = {}
 
-    if (typeof params.update == 'string') {
+    if (typeof params.update === 'string') {
       try {
         params.update = JSON.parse(params.update)
       } catch (e) {
@@ -562,7 +563,7 @@ MC.updateById = function (params) {
       }
     }
 
-    if (typeof params.update == 'string') {
+    if (typeof params.update === 'string') {
       try {
         params.update = JSON.parse(params.update)
       } catch (e) {
@@ -573,16 +574,17 @@ MC.updateById = function (params) {
     for (var key in params.update) {
       var item = params.update[key]
       if (reJsStrData.test(item)) params.update[key] = new Date(item)
-      else if(item === '') {
+      else if (item === '') {
         unset[key] = ''
         delete params.update[key]
       }
     }
 
     var updObj = {
-      '$set': params.update,
-      '$unset': unset
+      '$set': params.update
     }
+
+    if (Object.keys(unset).length) updObj.$unset = unset
 
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
@@ -712,7 +714,7 @@ MC.distinct = function (params) {
     if (!params.db || !params.collection || !params.field) return err('!params.db || !params.collection || !params.field')
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -739,7 +741,7 @@ MC.remove = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection || !params.query) return err('!params.db || !params.collection || !params.query')
 
-    if (typeof params.query == 'string') {
+    if (typeof params.query === 'string') {
       try {
         params.query = JSON.parse(params.query)
       } catch (e) {
@@ -766,7 +768,7 @@ MC.rename = function (params) {
     if (!params.db || !params.collection || !params.old || !params.new) return err('!params.db || !params.collection || !params.old || !params.new')
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -801,7 +803,7 @@ MC.unsetField = function (params) {
     var objId
 
     if (params.query) {
-      if (typeof params.query == 'string') {
+      if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
         } catch (e) {
@@ -827,8 +829,9 @@ MC.unsetField = function (params) {
       var unsetObj = {}
 
       if (params.fields) {
-        if (typeof params.fields == 'string')
+        if (typeof params.fields === 'string') {
           params.fields = JSON.parse(params.fields)
+        }
 
         params.fields.forEach(function (a) {
           unsetObj[a] = ''
