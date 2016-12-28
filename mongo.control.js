@@ -552,6 +552,7 @@ MC.updateById = function (params) {
     if (!params.db || !params.collection || !params.id || !params.update) return err('!params.db || !params.collection || !params.id || !params.update')
 
     var objId
+    var unset = {}
 
     if (reMongoId.test(params.id)) {
       try {
@@ -572,10 +573,15 @@ MC.updateById = function (params) {
     for (var key in params.update) {
       var item = params.update[key]
       if (reJsStrData.test(item)) params.update[key] = new Date(item)
+      else if(item === '') {
+        unset[key] = ''
+        delete params.update[key]
+      }
     }
 
     var updObj = {
-      '$set': params.update
+      '$set': params.update,
+      '$unset': unset
     }
 
     MongoClient.connect(params.db, function (e, db) {
