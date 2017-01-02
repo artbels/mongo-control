@@ -464,6 +464,59 @@ MC.find = function (params) {
   })
 }
 
+MC.lookup = function (params) {
+  return new Promise(function (res, err) {
+    if (!params.db || !params.collection || !params.localField || !params.foreignField || !params.foreignCollection) return err('!params.db || !params.collection || !params.localField || !params.foreignField || !params.foreignCollection')
+
+    if (params.query) {
+      if (typeof params.query === 'string') {
+        try {
+          params.query = JSON.parse(params.query)
+        } catch (e) {
+          params.query = {}
+          err(e)
+        }
+      }
+    } else params.query = {}
+
+    if (params.projection) {
+      if (typeof params.projection === 'string') {
+        try {
+          params.projection = JSON.parse(params.projection)
+        } catch (e) {
+          params.projection = {}
+          err(e)
+        }
+      }
+    } else params.projection = {}
+
+    if (params.limit) params.limit = parseInt(params.limit, 10)
+    else params.limit = 0
+
+    MongoClient.connect(params.db, function (e, db) {
+      if (e) return err(e)
+
+      db.collection(params.collection).aggregate([
+        {$lookup: {
+          from: params.collection,
+          localField: params.localField,
+          foreignField: params.foreignField,
+          as: params.foreignCollection
+        }}, {
+          $match: params.query
+        },
+        { $project: params.projection }
+
+      ], function (e, docs) {
+        if (e) return err(e)
+
+        res(docs)
+        db.close()
+      })
+    })
+  })
+}
+
 MC.insert = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection || !params.data) return err('!params.db || !params.collection || !params.data')
