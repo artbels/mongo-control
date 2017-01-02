@@ -468,10 +468,18 @@ MC.lookup = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection || !params.localField || !params.foreignField || !params.foreignCollection) return err('!params.db || !params.collection || !params.localField || !params.foreignField || !params.foreignCollection')
 
+    var pipeline = [{$lookup: {
+          from: params.collection,
+          localField: params.localField,
+          foreignField: params.foreignField,
+          as: params.foreignCollection
+        }}]
+
     if (params.query) {
       if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
+          pipeline.push({$match: params.query})
         } catch (e) {
           params.query = {}
           err(e)
@@ -483,6 +491,7 @@ MC.lookup = function (params) {
       if (typeof params.projection === 'string') {
         try {
           params.projection = JSON.parse(params.projection)
+          pipeline.push({$project: params.projection})
         } catch (e) {
           params.projection = {}
           err(e)
@@ -496,18 +505,7 @@ MC.lookup = function (params) {
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
 
-      db.collection(params.collection).aggregate([
-        {$lookup: {
-          from: params.collection,
-          localField: params.localField,
-          foreignField: params.foreignField,
-          as: params.foreignCollection
-        }}, {
-          $match: params.query
-        },
-        { $project: params.projection }
-
-      ], function (e, docs) {
+      db.collection(params.collection).aggregate(pipeline, function (e, docs) {
         if (e) return err(e)
 
         res(docs)
