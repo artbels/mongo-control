@@ -466,12 +466,12 @@ MC.find = function (params) {
 
 MC.lookup = function (params) {
   return new Promise(function (res, err) {
-    if (!params.db || !params.collection || !params.localField || !params.foreignField || !params.foreignCollection) return err('!params.db || !params.collection || !params.localField || !params.foreignField || !params.foreignCollection')
+    if (!params.db || !params.collection || !params.foreignCollection) return err('!params.db || !params.collection || !params.foreignCollection')
 
     var pipeline = [{$lookup: {
           from: params.foreignCollection,
-          localField: params.localField,
-          foreignField: params.foreignField,
+          localField: params.localField || params.foreignCollection,
+          foreignField: params.foreignField || '_id',
           as: params.foreignCollection
         }}]
 
