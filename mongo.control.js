@@ -469,7 +469,7 @@ MC.lookup = function (params) {
     if (!params.db || !params.collection || !params.localField || !params.foreignField || !params.foreignCollection) return err('!params.db || !params.collection || !params.localField || !params.foreignField || !params.foreignCollection')
 
     var pipeline = [{$lookup: {
-          from: params.collection,
+          from: params.foreignCollection,
           localField: params.localField,
           foreignField: params.foreignField,
           as: params.foreignCollection
