@@ -811,7 +811,15 @@ MC.aggregateById = function (params) {
       }
     }
 
-    params.pipeline.push({$match: query})
+    if (typeof params.pipeline === 'string') {
+      try {
+        params.pipeline = JSON.parse(params.pipeline)
+      } catch (e) {
+        err(e)
+      }
+    }
+
+    params.pipeline.unshift({$match: query})
 
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
