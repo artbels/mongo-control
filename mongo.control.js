@@ -125,6 +125,12 @@ MC.group = function (params) {
       if (typeof params.query === 'string') {
         try {
           params.query = JSON.parse(params.query)
+          for (var prop in params.query) {      
+            var val = params.query[prop]
+            if(val && val.oid) {
+              params.query[prop] = new ObjectID(val.oid)
+            }
+          }
         } catch (e) {
           err(e)
         }
@@ -182,6 +188,13 @@ MC.dupes = function (params) {
       }
     } else params.query = {}
 
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = new ObjectID(val.oid)
+      }
+    }
+
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
 
@@ -228,6 +241,13 @@ MC.groupCount = function (params) {
       }
     } else params.query = {}
 
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = new ObjectID(val.oid)
+      }
+    }
+
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
 
@@ -273,6 +293,13 @@ MC.each = function (params) {
         }
       }
     } else params.query = {}
+
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = new ObjectID(val.oid)
+      }
+    }
 
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
@@ -322,6 +349,13 @@ MC.keys = function (params) {
       }
     } else params.query = {}
 
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = new ObjectID(val.oid)
+      }
+    }
+
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
 
@@ -357,6 +391,13 @@ MC.schema = function (params) {
         }
       }
     } else params.query = {}
+
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = new ObjectID(val.oid)
+      }
+    }
 
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
@@ -409,6 +450,13 @@ MC.count = function (params) {
       }
     } else params.query = {}
 
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = new ObjectID(val.oid)
+      }
+    }
+
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
 
@@ -440,7 +488,7 @@ MC.find = function (params) {
     for (var prop in params.query) {      
       var val = params.query[prop]
       if(val && val.oid) {
-        params.query[prop] = ObjectID(val.oid)
+        params.query[prop] = new ObjectID(val.oid)
       }
     }
 
@@ -494,25 +542,53 @@ MC.lookup = function (params) {
       }
     } else params.query = {}
 
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = new ObjectID(val.oid)
+      }
+    }
+
     if (params.projection) {
       if (typeof params.projection === 'string') {
         try {
           params.projection = JSON.parse(params.projection)
           pipeline.push({$project: params.projection})
         } catch (e) {
-          params.projection = {}
           err(e)
         }
       }
-    } else params.projection = {}
-
-    if (params.limit) params.limit = parseInt(params.limit, 10)
-    else params.limit = 0
+    }
 
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
 
       db.collection(params.collection).aggregate(pipeline, function (e, docs) {
+        if (e) return err(e)
+
+        res(docs)
+        db.close()
+      })
+    })
+  })
+}
+
+MC.aggregate = function (params) {
+  return new Promise(function (res, err) {
+    if (!params.db || !params.collection || !params.pipeline) return err('!params.db || !params.collection || !params.pipeline')
+
+    if (typeof params.pipeline === 'string') {
+      try {
+        params.pipeline = JSON.parse(params.pipeline)
+      } catch (e) {
+        err(e)
+      }
+    }
+
+    MongoClient.connect(params.db, function (e, db) {
+      if (e) return err(e)
+
+      db.collection(params.collection).aggregate(params.pipeline, function (e, docs) {
         if (e) return err(e)
 
         res(docs)
@@ -535,6 +611,7 @@ MC.insert = function (params) {
           for (var key in row) {
             var item = row[key]
             if (reJsStrData.test(item)) params.data[i][key] = new Date(item)
+            else if(item.oid) params.data[i][key] = new ObjectID(item.oid)
           }
         }
       } catch (e) {
@@ -576,6 +653,13 @@ MC.update = function (params) {
       }
     } else params.query = {}
 
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = new ObjectID(val.oid)
+      }
+    }
+
     if (typeof params.update === 'string') {
       try {
         params.update = JSON.parse(params.update)
@@ -586,7 +670,9 @@ MC.update = function (params) {
 
     for (var key in params.update) {
       var item = params.update[key]
-      if (reJsStrData.test(item)) params.update[key] = new Date(item)
+      if(item.oid) {
+        params.update[key] = new ObjectID(item.oid)
+      } else if (reJsStrData.test(item)) params.update[key] = new Date(item)
     }
 
     var updObj = {
@@ -632,6 +718,7 @@ MC.updateById = function (params) {
     for (var key in params.update) {
       var item = params.update[key]
       if (reJsStrData.test(item)) params.update[key] = new Date(item)
+      else if(item.oid) params.update[key] = new ObjectID(item.oid)
       else if (item === '') {
         unset[key] = ''
         delete params.update[key]
@@ -780,6 +867,13 @@ MC.distinct = function (params) {
       }
     } else params.query = {}
 
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = new ObjectID(val.oid)
+      }
+    }
+
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
 
@@ -834,6 +928,13 @@ MC.rename = function (params) {
       }
     } else params.query = {}
 
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = new ObjectID(val.oid)
+      }
+    }
+
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
 
@@ -868,6 +969,13 @@ MC.unsetField = function (params) {
         }
       }
     } else params.query = {}
+
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = new ObjectID(val.oid)
+      }
+    }
 
     if (params.id) {
       if (reMongoId.test(params.id)) {
