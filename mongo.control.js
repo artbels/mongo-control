@@ -437,6 +437,13 @@ MC.find = function (params) {
       }
     } else params.query = {}
 
+    for (var prop in params.query) {      
+      var val = params.query[prop]
+      if(val && val.oid) {
+        params.query[prop] = ObjectID(val.oid)
+      }
+    }
+
     if (params.projection) {
       if (typeof params.projection === 'string') {
         try {
