@@ -795,6 +795,37 @@ MC.getById = function (params) {
   })
 }
 
+MC.aggregateById = function (params) {
+  return new Promise(function (res, err) {
+    if (!params.db || !params.collection || !params.id) return err('!params.db || !params.collection || !params.id')
+
+    params.pipeline = params.pipeline || []
+
+    var query = {$or: [{_id: params.id}]}
+
+    if (reMongoId.test(params.id)) {
+      try {
+        query.$or.push({_id: new ObjectID(params.id)})
+      } catch (idErr) {
+        console.warn(idErr)
+      }
+    }
+
+    params.pipeline.push({$match: query})
+
+    MongoClient.connect(params.db, function (e, db) {
+      if (e) return err(e)
+
+      db.collection(params.collection).aggregate(params.pipeline, function (e, docs) {
+        if (e) return err(e)
+
+        res(docs)
+        db.close()
+      })
+    })
+  })
+}
+
 MC.removeById = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection || !params.id) return err('!params.db || !params.collection || !params.id')
