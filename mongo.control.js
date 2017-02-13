@@ -490,6 +490,11 @@ MC.find = function (params) {
       if(val && val.oid) {
         params.query[prop] = new ObjectID(val.oid)
       }
+      if(params.next) {
+        params.query._id = {$gt: new ObjectID(params.next)}
+      } else if(params.prev) {
+        params.query._id = {$lt: new ObjectID(params.next)}
+      }
     }
 
     if (params.projection) {
