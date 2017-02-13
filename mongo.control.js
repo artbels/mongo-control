@@ -496,7 +496,7 @@ MC.find = function (params) {
       params.query._id = {$gt: new ObjectID(params.next)}
       params.limit = 1
     } else if(params.prev) {
-      params.query._id = {$lt: new ObjectID(params.next)}
+      params.query._id = {$lt: new ObjectID(params.prev)}
       params.limit = 1
       params.sortBy = {_id: -1}
     }
