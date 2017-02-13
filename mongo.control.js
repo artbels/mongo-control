@@ -494,8 +494,11 @@ MC.find = function (params) {
 
     if(params.next) {
       params.query._id = {$gt: new ObjectID(params.next)}
+      params.limit = 1
     } else if(params.prev) {
       params.query._id = {$lt: new ObjectID(params.next)}
+      params.limit = 1
+      params.sortBy = {_id: -1}
     }
 
     if (params.projection) {
@@ -515,7 +518,7 @@ MC.find = function (params) {
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
 
-      db.collection(params.collection).find(params.query, params.projection).limit(params.limit).toArray(function (e, docs) {
+      db.collection(params.collection).find(params.query, params.projection).sort(params.sortBy).limit(params.limit).toArray(function (e, docs) {
         if (e) return err(e)
 
         res(docs)
