@@ -474,6 +474,8 @@ MC.find = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection) return err('!params.db || !params.collection')
 
+    
+
     if (params.query) {
       if (typeof params.query === 'string') {
         try {
@@ -492,11 +494,24 @@ MC.find = function (params) {
       }
     }
 
+    var query = {
+      $and: [params.query]
+    }
+
     if(params.next) {
-      params.query._id = {$gt: new ObjectID(params.next)}
+      var nextObj = {$or: [{$gt: params.next}]}
+      if(reMongoId.test(params.next)) {
+        nextObj.$or.push({$gt: new ObjectID(params.next)})
+      }
+      query.$and.push(nextObj)
       params.limit = 1
+      
     } else if(params.prev) {
-      params.query._id = {$lt: new ObjectID(params.prev)}
+      var prevObj = {$or: [{$lt: params.prev}]}
+      if(reMongoId.test(params.prev)) {
+        prevObj.$or.push({$lt: new ObjectID(params.prev)})
+      }
+      query.$and.push(prevObj)
       params.limit = 1
       params.sortBy = {_id: -1}
     }
@@ -518,7 +533,7 @@ MC.find = function (params) {
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
 
-      db.collection(params.collection).find(params.query, params.projection).sort(params.sortBy).limit(params.limit).toArray(function (e, docs) {
+      db.collection(params.collection).find(query, params.projection).sort(params.sortBy).limit(params.limit).toArray(function (e, docs) {
         if (e) return err(e)
 
         res(docs)
