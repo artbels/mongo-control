@@ -472,9 +472,7 @@ MC.count = function (params) {
 
 MC.find = function (params) {
   return new Promise(function (res, err) {
-    if (!params.db || !params.collection) return err('!params.db || !params.collection')
-
-    
+    if (!params.db || !params.collection) return err('!params.db || !params.collection')  
 
     if (params.query) {
       if (typeof params.query === 'string') {
@@ -495,7 +493,7 @@ MC.find = function (params) {
     }
 
     var query
-    if(query.$and) {
+    if(params.query.$and) {
       query = params.query
     } else {
       query = {
@@ -534,8 +532,6 @@ MC.find = function (params) {
 
     if (params.limit) params.limit = parseInt(params.limit, 10)
     else params.limit = 0
-
-    console.log(query)
 
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
