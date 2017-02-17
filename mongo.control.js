@@ -494,8 +494,13 @@ MC.find = function (params) {
       }
     }
 
-    var query = {
-      $and: [params.query]
+    var query
+    if(query.$and) {
+      query = params.query
+    } else {
+      query = {
+        $and: [params.query]
+      }
     }
 
     if(params.next) {
@@ -505,7 +510,7 @@ MC.find = function (params) {
       }
       query.$and.push(nextObj)
       params.limit = 1
-      
+
     } else if(params.prev) {
       var prevObj = {$or: [{$lt: params.prev}]}
       if(reMongoId.test(params.prev)) {
@@ -529,6 +534,8 @@ MC.find = function (params) {
 
     if (params.limit) params.limit = parseInt(params.limit, 10)
     else params.limit = 0
+
+    console.log(query)
 
     MongoClient.connect(params.db, function (e, db) {
       if (e) return err(e)
