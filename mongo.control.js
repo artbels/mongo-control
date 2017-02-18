@@ -6,6 +6,27 @@ var reMongoId = /^[0-9a-f]{24}$/
 
 var MC = module.exports = {}
 
+MC.incrId = function (params) {
+  return new Promise(function (res, err) {
+    if (!params.db || !params.collection) return err('!params.db || !params.collection')
+
+    MongoClient.connect(params.db, function (e, db) {
+      if (e) return err(e)
+
+      db.collection(params.collection).find().sort({_id: -1}).limit(1).toArray(function (e, r) {
+        if (e) return err(e)
+
+        if (!r && !r.length && !r[0]._id) return err(r)
+
+        if (typeof r[0]._id !== 'number') return err('id is not a number')
+
+        res(r[0]._id ++)
+        db.close()
+      })
+    })
+  })
+}
+
 MC.createIndex = function (params) {
   return new Promise(function (res, err) {
     if (!params.db || !params.collection || !params.index) return err('!params.db || !params.collection || !params.index')
@@ -502,21 +523,31 @@ MC.find = function (params) {
     }
 
     if(params.next) {
-      var nextObj = {$or: [{$gt: params.next}]}
+      var nextObj
       if(reMongoId.test(params.next)) {
         nextObj.$or.push({$gt: new ObjectID(params.next)})
+      } else if(typeof params.next === 'number') {
+        nextObj.$or.push({$lt: params.next})
       }
-      query.$and.push(nextObj)
-      params.limit = 1
+
+      if(nextObj) {
+        query.$and.push(nextObj)
+        params.limit = 1
+      }   
 
     } else if(params.prev) {
       var prevObj = {$or: [{$lt: params.prev}]}
       if(reMongoId.test(params.prev)) {
         prevObj.$or.push({$lt: new ObjectID(params.prev)})
+      } else if(typeof params.prev === 'number') {
+        prevObj.$or.push({$lt: params.prev})
       }
-      query.$and.push(prevObj)
-      params.limit = 1
-      params.sortBy = {_id: -1}
+
+      if(prevObj) {
+        query.$and.push(prevObj)
+        params.limit = 1
+        params.sortBy = {_id: -1}
+      }      
     }
 
     if (params.projection) {
