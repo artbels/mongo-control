@@ -523,11 +523,11 @@ MC.find = function (params) {
     }
 
     if(params.next) {
-      var nextObj
+      var nextObj = {$or: []}
       if(reMongoId.test(params.next)) {
-        nextObj.$or.push({$gt: new ObjectID(params.next)})
+        nextObj.$or.push({_id: {$gt: new ObjectID(params.next)}})
       } else if(typeof params.next === 'number') {
-        nextObj.$or.push({$lt: params.next})
+        nextObj.$or.push({_id: {$gt: params.next}})
       }
 
       if(nextObj) {
@@ -536,11 +536,11 @@ MC.find = function (params) {
       }   
 
     } else if(params.prev) {
-      var prevObj = {$or: [{$lt: params.prev}]}
+      var prevObj = {$or: []}
       if(reMongoId.test(params.prev)) {
-        prevObj.$or.push({$lt: new ObjectID(params.prev)})
+        prevObj.$or.push({_id: {$lt: new ObjectID(params.prev)}})
       } else if(typeof params.prev === 'number') {
-        prevObj.$or.push({$lt: params.prev})
+        prevObj.$or.push({_id: {$lt: params.prev}})
       }
 
       if(prevObj) {
