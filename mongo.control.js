@@ -20,7 +20,9 @@ MC.incrId = function (params) {
 
         if (typeof r[0]._id !== 'number') return err('id is not a number')
 
-        res(r[0]._id ++)
+        r[0]._id ++
+
+        res(r[0]._id)
         db.close()
       })
     })
