@@ -1080,6 +1080,7 @@ MC.unsetField = function (params) {
       if (reMongoId.test(params.id)) {
         try {
           objId = new ObjectID(params.id)
+          params.query._id = objId
         } catch (idErr) {
           console.warn(idErr)
         }
@@ -1101,9 +1102,7 @@ MC.unsetField = function (params) {
         })
       } else unsetObj[params.field] = ''
 
-      db.collection(params.collection).updateMany({
-        _id: objId || params.id
-      }, {
+      db.collection(params.collection).updateMany(params.query, {
         '$unset': unsetObj
       }, function (e, r) {
         if (e) return err(e)
@@ -1112,9 +1111,8 @@ MC.unsetField = function (params) {
           res(r)
           db.close()
         } else {
-          db.collection(params.collection).updateMany({
-            _id: params.id
-          }, {
+          params.query._id = params.id
+          db.collection(params.collection).updateMany(params.query, {
             '$unset': unsetObj
           }, function (e, r) {
             if (e) return err(e)
